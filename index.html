@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lampu Nama: Misi Kata Nama</title>
+  <style>
+    :root {
+      --ink: #1b2636;
+      --muted: #5c6b7a;
+      --paper: #fffaf0;
+      --panel: #ffffff;
+      --green: #22a06b;
+      --red: #e74c3c;
+      --yellow: #f4c542;
+      --blue: #2d7dd2;
+      --shadow: 0 16px 40px rgba(34, 40, 49, 0.18);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(244, 197, 66, 0.35), transparent 32rem),
+        linear-gradient(135deg, #f8fbff 0%, #fff6df 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(27, 38, 54, 0.08);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(34, 40, 49, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, var(--green), var(--yellow), var(--red), var(--green));
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 0 0 5px #fff;
+      flex: 0 0 auto;
+    }
+
+    .brand-mark::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #263238;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+      line-height: 1.12;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
+
+    .sound-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .icon-btn,
+    .primary-btn,
+    .ghost-btn,
+    .choice-btn {
+      border: 0;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .icon-btn {
+      min-width: 42px;
+      min-height: 42px;
+      padding: 0 12px;
+      background: #edf3f8;
+      color: var(--ink);
+      border: 1px solid rgba(27, 38, 54, 0.1);
+    }
+
+    .icon-btn:hover,
+    .primary-btn:hover,
+    .ghost-btn:hover,
+    .choice-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(34, 40, 49, 0.15);
+    }
+
+    .primary-btn {
+      padding: 14px 22px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .ghost-btn {
+      padding: 12px 18px;
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid rgba(27, 38, 54, 0.12);
+      font-weight: 700;
+    }
+
+    .screen {
+      display: none;
+      flex: 1;
+    }
+
+    .screen.active {
+      display: grid;
+    }
+
+    .hero {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+      align-items: center;
+      gap: 24px;
+      padding: 24px 0;
+    }
+
+    .hero-copy {
+      padding: clamp(14px, 4vw, 36px);
+    }
+
+    .hero-copy h2 {
+      font-size: clamp(2.1rem, 8vw, 5rem);
+      line-height: 0.95;
+      max-width: 760px;
+    }
+
+    .hero-copy p {
+      margin-top: 16px;
+      max-width: 650px;
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
+      color: #3e4b57;
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .scene {
+      position: relative;
+      min-height: 430px;
+      overflow: hidden;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0.25)),
+        linear-gradient(160deg, #aee3ff 0%, #f9e6a0 52%, #8bd17c 53%, #55b36a 100%);
+      box-shadow: var(--shadow);
+      border: 4px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .track {
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      bottom: 74px;
+      height: 62px;
+      background: repeating-linear-gradient(90deg, #fff 0 34px, #f0d67d 34px 48px);
+      border-radius: 60px;
+      transform: rotate(-2deg);
+      box-shadow: inset 0 0 0 4px rgba(27, 38, 54, 0.08);
+    }
+
+    .gate {
+      position: absolute;
+      left: 8%;
+      bottom: 112px;
+      width: 82px;
+      height: 86px;
+      background: #fff;
+      border: 5px solid #1d344a;
+      border-radius: 8px 8px 2px 2px;
+    }
+
+    .gate::before {
+      content: "MULA";
+      position: absolute;
+      left: -4px;
+      top: -34px;
+      width: 82px;
+      text-align: center;
+      padding: 4px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 8px;
+      font-weight: 800;
+    }
+
+    .finish {
+      position: absolute;
+      right: 8%;
+      bottom: 102px;
+      width: 84px;
+      height: 112px;
+      background:
+        linear-gradient(90deg, #1d344a 0 12px, transparent 12px 24px),
+        linear-gradient(#fff 0 12px, #111 12px 24px);
+      background-size: 24px 24px;
+      border: 4px solid #1d344a;
+      border-radius: 8px;
+    }
+
+    .child {
+      position: absolute;
+      bottom: 126px;
+      left: 22%;
+      width: 72px;
+      height: 110px;
+      transition: left 0.4s ease;
+    }
+
+    .head {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: #ffd1a3;
+      border: 3px solid #1d344a;
+      position: relative;
+    }
+
+    .head::before,
+    .head::after {
+      content: "";
+      position: absolute;
+      top: 22px;
+      width: 6px;
+      height: 6px;
+      background: #1d344a;
+      border-radius: 50%;
+    }
+
+    .head::before {
+      left: 14px;
+    }
+
+    .head::after {
+      right: 14px;
+    }
+
+    .body {
+      width: 58px;
+      height: 54px;
+      margin: -2px auto 0;
+      border-radius: 14px 14px 8px 8px;
+      background: #4f8edb;
+      border: 3px solid #1d344a;
+      position: relative;
+    }
+
+    .body::before,
+    .body::after {
+      content: "";
+      position: absolute;
+      bottom: -18px;
+      width: 15px;
+      height: 25px;
+      border-radius: 10px;
+      background: #1d344a;
+    }
+
+    .body::before {
+      left: 9px;
+    }
+
+    .body::after {
+      right: 9px;
+    }
+
+    .helper-bear {
+      position: absolute;
+      right: 8%;
+      top: 44px;
+      width: 150px;
+      height: 166px;
+    }
+
+    .bear-face {
+      position: absolute;
+      left: 14px;
+      top: 20px;
+      width: 118px;
+      height: 112px;
+      border-radius: 42% 42% 48% 48%;
+      background: #ffd993;
+      border: 4px solid #6f4b2d;
+    }
+
+    .bear-face::before,
+    .bear-face::after {
+      content: "";
+      position: absolute;
+      top: -18px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ffd993;
+      border: 4px solid #6f4b2d;
+      z-index: -1;
+    }
+
+    .bear-face::before {
+      left: 10px;
+    }
+
+    .bear-face::after {
+      right: 10px;
+    }
+
+    .bear-eye {
+      position: absolute;
+      top: 48px;
+      width: 10px;
+      height: 10px;
+      background: #4b3121;
+      border-radius: 50%;
+    }
+
+    .bear-eye.left {
+      left: 36px;
+    }
+
+    .bear-eye.right {
+      right: 36px;
+    }
+
+    .bear-smile {
+      position: absolute;
+      left: 47px;
+      top: 66px;
+      width: 28px;
+      height: 15px;
+      border-bottom: 4px solid #4b3121;
+      border-radius: 0 0 30px 30px;
+    }
+
+    .speech {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      top: 28px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      font-weight: 800;
+      color: #1d344a;
+      box-shadow: 0 8px 22px rgba(34, 40, 49, 0.12);
+    }
+
+    .rules {
+      place-items: center;
+      padding: 18px 0;
+    }
+
+    .rules-panel,
+    .game-panel,
+    .result-panel {
+      width: min(900px, 100%);
+      background: var(--panel);
+      border: 1px solid rgba(27, 38, 54, 0.08);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 4vw, 28px);
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .rule-card {
+      padding: 14px;
+      border-radius: 12px;
+      background: #f4f8fb;
+      border: 1px solid rgba(27, 38, 54, 0.08);
+      min-height: 96px;
+    }
+
+    .rule-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #183650;
+    }
+
+    .game {
+      align-items: stretch;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .hud-item {
+      padding: 10px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid rgba(27, 38, 54, 0.09);
+      box-shadow: 0 6px 14px rgba(34, 40, 49, 0.06);
+      text-align: center;
+      min-height: 64px;
+      display: grid;
+      align-content: center;
+    }
+
+    .hud-label {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .hud-value {
+      font-size: 1.25rem;
+      font-weight: 900;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .mini-scene {
+      position: relative;
+      min-height: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.08)),
+        linear-gradient(160deg, #bde8ff 0%, #f7e7a3 52%, #9ad87d 53%, #62bd67 100%);
+      border: 3px solid rgba(255,255,255,0.75);
+    }
+
+    .signal {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 8px 20px rgba(34,40,49,0.12);
+      font-weight: 900;
+    }
+
+    .lamp {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(34, 160, 107, 0.18);
+    }
+
+    .signal.red .lamp {
+      background: var(--red);
+      box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.18);
+    }
+
+    .progress-path {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 76px;
+      height: 54px;
+      border-radius: 40px;
+      background: repeating-linear-gradient(90deg, #fff 0 28px, #f3d87e 28px 40px);
+      box-shadow: inset 0 0 0 3px rgba(27, 38, 54, 0.08);
+    }
+
+    .player {
+      position: absolute;
+      left: 12%;
+      bottom: 116px;
+      width: 60px;
+      transition: left 0.45s ease;
+    }
+
+    .goal-flag {
+      position: absolute;
+      right: 24px;
+      bottom: 118px;
+      width: 52px;
+      height: 88px;
+      border-left: 7px solid #1d344a;
+    }
+
+    .goal-flag::after {
+      content: "TAMAT";
+      position: absolute;
+      left: 7px;
+      top: 0;
+      width: 78px;
+      padding: 7px;
+      color: #fff;
+      background: var(--red);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.75rem;
+      font-weight: 900;
+    }
+
+    .content-box {
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid rgba(27, 38, 54, 0.08);
+      padding: clamp(14px, 3vw, 22px);
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .memory-card {
+      border: 2px dashed rgba(45, 125, 210, 0.36);
+      background: #f2f8ff;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .memory-title {
+      font-weight: 900;
+      color: #183650;
+      margin-bottom: 8px;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .note {
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid rgba(27, 38, 54, 0.08);
+      line-height: 1.45;
+    }
+
+    .note strong {
+      color: var(--blue);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .question-card {
+      background: #fff8e5;
+      border: 1px solid rgba(244, 197, 66, 0.6);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .word {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: min(100%, 260px);
+      min-height: 74px;
+      padding: 12px 18px;
+      margin-top: 10px;
+      border-radius: 14px;
+      background: #fff;
+      border: 3px solid #1d344a;
+      font-size: clamp(1.9rem, 7vw, 3.2rem);
+      font-weight: 900;
+      color: #111f2e;
+      word-break: break-word;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .choice-btn {
+      min-height: 98px;
+      padding: 12px;
+      background: #f6f9fb;
+      border: 2px solid rgba(27, 38, 54, 0.12);
+      font-weight: 900;
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      color: var(--ink);
+    }
+
+    .choice-btn span {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .choice-btn.correct {
+      background: #e7fff2;
+      border-color: var(--green);
+    }
+
+    .choice-btn.wrong {
+      background: #fff0ee;
+      border-color: var(--red);
+    }
+
+    .feedback {
+      min-height: 86px;
+      border-radius: 14px;
+      padding: 14px;
+      background: #f4f8fb;
+      border: 1px solid rgba(27, 38, 54, 0.08);
+      line-height: 1.45;
+    }
+
+    .feedback.good {
+      background: #e7fff2;
+      border-color: rgba(34, 160, 107, 0.35);
+    }
+
+    .feedback.try {
+      background: #fff4ee;
+      border-color: rgba(231, 76, 60, 0.35);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .countdown {
+      display: inline-grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      margin-left: 6px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .result {
+      place-items: center;
+      padding: 18px 0;
+    }
+
+    .result-panel {
+      text-align: center;
+    }
+
+    .big-score {
+      font-size: clamp(2.2rem, 10vw, 5rem);
+      font-weight: 900;
+      color: var(--blue);
+      margin: 12px 0;
+    }
+
+    .design-notes {
+      margin-top: 18px;
+      display: grid;
+      gap: 8px;
+      text-align: left;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 820px) {
+      .hero,
+      .stage {
+        grid-template-columns: 1fr;
+      }
+
+      .scene,
+      .mini-scene {
+        min-height: 330px;
+      }
+
+      .hud {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .rules-grid,
+      .note-grid,
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .sound-row {
+        justify-content: flex-start;
+      }
+
+      .helper-bear {
+        transform: scale(0.85);
+        transform-origin: top right;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        padding: 10px;
+      }
+
+      .hero-copy {
+        padding: 10px 4px;
+      }
+
+      .hero-actions,
+      .action-row {
+        flex-direction: column;
+      }
+
+      .primary-btn,
+      .ghost-btn {
+        width: 100%;
+      }
+
+      .word {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgm" src="assets/bgm.mp3" loop preload="auto"></audio>
+  <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="assets/wrong.mp3" preload="auto"></audio>
+  <audio id="levelSound" src="assets/level-up.mp3" preload="auto"></audio>
+
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <h1>Lampu Nama: Misi Kata Nama</h1>
+          <p class="subtitle">Year 1 Bahasa Melayu · Kata Nama Am & Kata Nama Khas</p>
+        </div>
+      </div>
+      <div class="sound-row">
+        <button class="icon-btn" id="soundBtn" title="Buka atau tutup bunyi">Bunyi: Tutup</button>
+        <button class="icon-btn" id="restartTopBtn" title="Mula semula">↻</button>
+      </div>
+    </header>
+
+    <section class="screen hero active" id="startScreen">
+      <div class="hero-copy">
+        <h2>Berhenti, fikir, pilih nama!</h2>
+        <p>
+          在红灯绿灯挑战里，学生要分辨普通名词
+          <strong>Kata Nama Am</strong> 和特别名词 <strong>Kata Nama Khas</strong>。
+          先看记忆小帮手，再闯过每一关。
+        </p>
+        <div class="hero-actions">
+          <button class="primary-btn" id="startBtn">开始游戏</button>
+          <button class="ghost-btn" id="rulesBtn">先看规则</button>
+        </div>
+      </div>
+      <div class="scene" aria-label="红灯绿灯游戏场景">
+        <div class="speech">Lampu Hijau: ingat nota. Lampu Merah: jawab soalan.</div>
+        <div class="track"></div>
+        <div class="gate"></div>
+        <div class="finish"></div>
+        <div class="child" style="left: 23%">
+          <div class="head"></div>
+          <div class="body"></div>
+        </div>
+        <div class="helper-bear">
+          <div class="bear-face">
+            <div class="bear-eye left"></div>
+            <div class="bear-eye right"></div>
+            <div class="bear-smile"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen rules" id="rulesScreen">
+      <div class="rules-panel">
+        <h2>游戏规则</h2>
+        <p class="subtitle">学生一看就知道：先记、再选、答对前进。</p>
+        <div class="rules-grid">
+          <div class="rule-card">
+            <strong>1. 记忆小帮手</strong>
+            每一关先看提示卡，复习 `Kata Nama Am` 和 `Kata Nama Khas`。
+          </div>
+          <div class="rule-card">
+            <strong>2. Lampu Merah</strong>
+            红灯出现时，题目出现。选择这个词属于哪一种名词。
+          </div>
+          <div class="rule-card">
+            <strong>3. 分数与星星</strong>
+            答对得 10 分。每 30 分得到 1 颗星，最多 3 颗星。
+          </div>
+          <div class="rule-card">
+            <strong>4. 生命值</strong>
+            答错会少 1 颗心，但会给温柔提示，可以继续学习。
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="primary-btn" id="playFromRulesBtn">我知道了，开始</button>
+          <button class="ghost-btn" id="backStartBtn">回到开始画面</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen game" id="gameScreen">
+      <div class="game-panel">
+        <div class="hud" aria-label="游戏状态">
+          <div class="hud-item">
+            <span class="hud-label">关卡</span>
+            <span class="hud-value" id="levelHud">1 / 8</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">分数</span>
+            <span class="hud-value" id="scoreHud">0</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">星星</span>
+            <span class="hud-value" id="starsHud">☆ ☆ ☆</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">生命值</span>
+            <span class="hud-value" id="livesHud">♥ ♥ ♥</span>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="mini-scene">
+            <div class="signal" id="signalBox">
+              <span class="lamp"></span>
+              <span id="signalText">Lampu Hijau</span>
+            </div>
+            <div class="progress-path"></div>
+            <div class="goal-flag"></div>
+            <div class="player" id="player">
+              <div class="head"></div>
+              <div class="body"></div>
+            </div>
+            <div class="helper-bear" style="right: 24px; top: 88px">
+              <div class="bear-face">
+                <div class="bear-eye left"></div>
+                <div class="bear-eye right"></div>
+                <div class="bear-smile"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-box">
+            <div class="memory-card" id="memoryCard">
+              <div class="memory-title">
+                记忆小帮手 <span class="countdown" id="countdown">8</span>
+              </div>
+              <div class="note-grid">
+                <div class="note">
+                  <strong>Kata Nama Am 普通名词</strong>
+                  一般的人、动物、东西、地方。例：guru, kucing, buku, sekolah。
+                </div>
+                <div class="note">
+                  <strong>Kata Nama Khas 特别名词</strong>
+                  特定名字，通常第一个字母大写。例：Cikgu Sara, Si Comel, Proton Saga, Kuala Lumpur。
+                </div>
+              </div>
+            </div>
+
+            <div class="question-card hidden" id="questionCard">
+              <p id="questionPrompt">请选择正确答案。</p>
+              <div class="word" id="wordBox">buku</div>
+            </div>
+
+            <div class="choices hidden" id="choicesBox">
+              <button class="choice-btn" data-answer="am">
+                Kata Nama Am
+                <span>普通名词：一般名称</span>
+              </button>
+              <button class="choice-btn" data-answer="khas">
+                Kata Nama Khas
+                <span>特别名词：专有名称</span>
+              </button>
+            </div>
+
+            <div class="feedback" id="feedbackBox">
+              准备时间开始。先看提示卡，再回答题目。
+            </div>
+
+            <div class="action-row">
+              <button class="primary-btn hidden" id="nextBtn">下一关</button>
+              <button class="ghost-btn" id="hintBtn">提示卡</button>
+              <button class="ghost-btn" id="restartGameBtn">重来</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen result" id="resultScreen">
+      <div class="result-panel">
+        <h2 id="resultTitle">任务完成！</h2>
+        <div class="big-score" id="finalScore">80</div>
+        <p id="resultMessage">你已经会分辨 Kata Nama Am 和 Kata Nama Khas 了。</p>
+        <div class="hero-actions" style="justify-content:center">
+          <button class="primary-btn" id="playAgainBtn">再玩一次</button>
+          <button class="ghost-btn" id="reviewRulesBtn">复习规则</button>
+        </div>
+        <div class="design-notes">
+          <p><strong>游戏名字：</strong>Lampu Nama: Misi Kata Nama</p>
+          <p><strong>故事背景：</strong>孩子要通过红灯绿灯路，到达“名词小站”。每答对一次，就向终点前进一步。</p>
+          <p><strong>画面设计：</strong>清爽校园跑道、红绿灯、友善小帮手、低干扰色块，适合手机和电脑。</p>
+          <p><strong>BGM / 音效：</strong>建议使用轻快木琴或拍手节奏 BGM；答对用清脆铃声，答错用柔和提示音，过关用短上升音。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const levels = [
+      {
+        word: "buku",
+        answer: "am",
+        type: "东西",
+        explain: "`buku` 是一般的东西，所以是 Kata Nama Am。"
+      },
+      {
+        word: "Sang Kancil",
+        answer: "khas",
+        type: "动物名字",
+        explain: "`Sang Kancil` 是特定角色的名字，所以是 Kata Nama Khas。"
+      },
+      {
+        word: "sekolah",
+        answer: "am",
+        type: "地方",
+        explain: "`sekolah` 是一般地方名称，所以是 Kata Nama Am。"
+      },
+      {
+        word: "Sekolah Taman Seri Kuching",
+        answer: "khas",
+        type: "学校名字",
+        explain: "`Sekolah Taman Seri Kuching` 是特定学校名字，所以是 Kata Nama Khas。"
+      },
+      {
+        word: "anjing",
+        answer: "am",
+        type: "动物",
+        explain: "`anjing` 是一般动物名称，所以是 Kata Nama Am。"
+      },
+      {
+        word: "Si Comel",
+        answer: "khas",
+        type: "动物名字",
+        explain: "`Si Comel` 是特定小动物的名字，所以是 Kata Nama Khas。"
+      },
+      {
+        word: "guru",
+        answer: "am",
+        type: "人",
+        explain: "`guru` 是一般人物称呼，所以是 Kata Nama Am。"
+      },
+      {
+        word: "Cikgu Sara",
+        answer: "khas",
+        type: "老师名字",
+        explain: "`Cikgu Sara` 是特定老师的名字，所以是 Kata Nama Khas。"
+      }
+    ];
+
+    const screens = {
+      start: document.getElementById("startScreen"),
+      rules: document.getElementById("rulesScreen"),
+      game: document.getElementById("gameScreen"),
+      result: document.getElementById("resultScreen")
+    };
+
+    const state = {
+      level: 0,
+      score: 0,
+      lives: 3,
+      answered: false,
+      sound: false,
+      timer: null,
+      audioContext: null
+    };
+
+    const bgm = document.getElementById("bgm");
+    const soundBtn = document.getElementById("soundBtn");
+    const levelHud = document.getElementById("levelHud");
+    const scoreHud = document.getElementById("scoreHud");
+    const starsHud = document.getElementById("starsHud");
+    const livesHud = document.getElementById("livesHud");
+    const signalBox = document.getElementById("signalBox");
+    const signalText = document.getElementById("signalText");
+    const countdown = document.getElementById("countdown");
+    const memoryCard = document.getElementById("memoryCard");
+    const questionCard = document.getElementById("questionCard");
+    const choicesBox = document.getElementById("choicesBox");
+    const wordBox = document.getElementById("wordBox");
+    const questionPrompt = document.getElementById("questionPrompt");
+    const feedbackBox = document.getElementById("feedbackBox");
+    const nextBtn = document.getElementById("nextBtn");
+    const player = document.getElementById("player");
+    const finalScore = document.getElementById("finalScore");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultMessage = document.getElementById("resultMessage");
+
+    function showScreen(name) {
+      Object.values(screens).forEach(screen => screen.classList.remove("active"));
+      screens[name].classList.add("active");
+    }
+
+    function resetGame() {
+      clearInterval(state.timer);
+      state.level = 0;
+      state.score = 0;
+      state.lives = 3;
+      state.answered = false;
+      updateHud();
+      showScreen("game");
+      loadLevel();
+    }
+
+    function updateHud() {
+      levelHud.textContent = `${Math.min(state.level + 1, levels.length)} / ${levels.length}`;
+      scoreHud.textContent = state.score;
+      const starCount = Math.min(3, Math.floor(state.score / 30));
+      starsHud.textContent = Array.from({ length: 3 }, (_, i) => i < starCount ? "★" : "☆").join(" ");
+      livesHud.textContent = Array.from({ length: 3 }, (_, i) => i < state.lives ? "♥" : "♡").join(" ");
+      const percent = levels.length <= 1 ? 82 : 12 + (state.level / (levels.length - 1)) * 70;
+      player.style.left = `${Math.min(82, percent)}%`;
+    }
+
+    function setSignal(mode) {
+      const isRed = mode === "red";
+      signalBox.classList.toggle("red", isRed);
+      signalText.textContent = isRed ? "Lampu Merah" : "Lampu Hijau";
+    }
+
+    function loadLevel() {
+      const level = levels[state.level];
+      state.answered = false;
+      updateHud();
+      setSignal("green");
+      memoryCard.classList.remove("hidden");
+      questionCard.classList.add("hidden");
+      choicesBox.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+      feedbackBox.className = "feedback";
+      feedbackBox.textContent = `第 ${state.level + 1} 关：先看记忆小帮手。准备好后，红灯会出题。`;
+      clearChoiceStyles();
+
+      let seconds = 8;
+      countdown.textContent = seconds;
+      clearInterval(state.timer);
+      state.timer = setInterval(() => {
+        seconds -= 1;
+        countdown.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(state.timer);
+          showQuestion(level);
+        }
+      }, 1000);
+    }
+
+    function showQuestion(level) {
+      setSignal("red");
+      memoryCard.classList.add("hidden");
+      questionCard.classList.remove("hidden");
+      choicesBox.classList.remove("hidden");
+      wordBox.textContent = level.word;
+      questionPrompt.textContent = `这个 ${level.type} 是哪一种名词？`;
+      feedbackBox.className = "feedback";
+      feedbackBox.textContent = "红灯停一停，想一想，再选择答案。";
+      playTone("question");
+    }
+
+    function clearChoiceStyles() {
+      document.querySelectorAll(".choice-btn").forEach(btn => {
+        btn.classList.remove("correct", "wrong");
+        btn.disabled = false;
+      });
+    }
+
+    function answerQuestion(choice, button) {
+      if (state.answered) return;
+      state.answered = true;
+      const level = levels[state.level];
+      const isCorrect = choice === level.answer;
+      document.querySelectorAll(".choice-btn").forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.answer === level.answer) btn.classList.add("correct");
+      });
+
+      if (isCorrect) {
+        state.score += 10;
+        feedbackBox.className = "feedback good";
+        feedbackBox.innerHTML = `<strong>答对了！Bagus!</strong><br>${level.explain}`;
+        playMedia("correctSound", "correct");
+      } else {
+        state.lives -= 1;
+        button.classList.add("wrong");
+        feedbackBox.className = "feedback try";
+        feedbackBox.innerHTML = `<strong>没关系，再学一次。</strong><br>${level.explain}<br>小帮手提示：有特定名字或大写开头，通常是 Kata Nama Khas。`;
+        playMedia("wrongSound", "wrong");
+      }
+
+      updateHud();
+      nextBtn.textContent = state.level === levels.length - 1 || state.lives <= 0 ? "看结果" : "下一关";
+      nextBtn.classList.remove("hidden");
+    }
+
+    function nextLevel() {
+      if (state.lives <= 0 || state.level >= levels.length - 1) {
+        showResult();
+        return;
+      }
+      state.level += 1;
+      playMedia("levelSound", "level");
+      loadLevel();
+    }
+
+    function showResult() {
+      clearInterval(state.timer);
+      showScreen("result");
+      finalScore.textContent = `${state.score} 分`;
+      const stars = Math.min(3, Math.floor(state.score / 30));
+      if (state.lives <= 0) {
+        resultTitle.textContent = "今天先练到这里";
+        resultMessage.textContent = "你已经看过很多例子了。点“再玩一次”，小帮手会陪你继续练习。";
+      } else if (stars === 3) {
+        resultTitle.textContent = "任务完成，三颗星！";
+        resultMessage.textContent = "你能分辨普通名词和特别名词了，太棒了。";
+      } else {
+        resultTitle.textContent = "任务完成！";
+        resultMessage.textContent = "继续练习，就能更快认出 Kata Nama Am 和 Kata Nama Khas。";
+      }
+    }
+
+    function showHint() {
+      if (state.answered) {
+        feedbackBox.className = "feedback";
+        feedbackBox.textContent = "这一题已经答完了。按“下一关”继续挑战。";
+        return;
+      }
+      clearInterval(state.timer);
+      setSignal("green");
+      memoryCard.classList.remove("hidden");
+      questionCard.classList.add("hidden");
+      choicesBox.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+      feedbackBox.className = "feedback";
+      feedbackBox.textContent = "这是提示卡。看完 5 秒后，题目会自动回来。";
+      let seconds = 5;
+      countdown.textContent = seconds;
+      state.timer = setInterval(() => {
+        seconds -= 1;
+        countdown.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(state.timer);
+          showQuestion(levels[state.level]);
+        }
+      }, 1000);
+    }
+
+    function toggleSound() {
+      state.sound = !state.sound;
+      soundBtn.textContent = state.sound ? "Bunyi: Buka" : "Bunyi: Tutup";
+      if (state.sound) {
+        bgm.volume = 0.22;
+        bgm.play().catch(() => playTone("level"));
+      } else {
+        bgm.pause();
+      }
+    }
+
+    function playMedia(id, fallback) {
+      if (!state.sound) return;
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => playTone(fallback));
+      } else {
+        playTone(fallback);
+      }
+    }
+
+    function playTone(kind) {
+      if (!state.sound) return;
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      if (!state.audioContext) state.audioContext = new AudioContext();
+      const ctx = state.audioContext;
+      const now = ctx.currentTime;
+      const notes = {
+        correct: [523, 659, 784],
+        wrong: [220, 196],
+        level: [392, 523, 659],
+        question: [330]
+      }[kind] || [440];
+
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.001, now + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.12, now + i * 0.12 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.16);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now + i * 0.12);
+        osc.stop(now + i * 0.12 + 0.18);
+      });
+    }
+
+    document.getElementById("startBtn").addEventListener("click", resetGame);
+    document.getElementById("rulesBtn").addEventListener("click", () => showScreen("rules"));
+    document.getElementById("playFromRulesBtn").addEventListener("click", resetGame);
+    document.getElementById("backStartBtn").addEventListener("click", () => showScreen("start"));
+    document.getElementById("restartTopBtn").addEventListener("click", resetGame);
+    document.getElementById("restartGameBtn").addEventListener("click", resetGame);
+    document.getElementById("playAgainBtn").addEventListener("click", resetGame);
+    document.getElementById("reviewRulesBtn").addEventListener("click", () => showScreen("rules"));
+    document.getElementById("hintBtn").addEventListener("click", showHint);
+    document.getElementById("nextBtn").addEventListener("click", nextLevel);
+    soundBtn.addEventListener("click", toggleSound);
+
+    document.querySelectorAll(".choice-btn").forEach(btn => {
+      btn.addEventListener("click", () => answerQuestion(btn.dataset.answer, btn));
+    });
+  </script>
+</body>
+</html>
